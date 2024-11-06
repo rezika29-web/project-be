@@ -1,0 +1,11 @@
+export const ADMIN_ID = "a86899a2-e6dd-493d-8ba1-81680f31bd73"
+export const KOORDINATOR_ID = "229a9fd6-59fa-45fe-a66e-632c8a83db5e"
+export const KEPALA_ID = "74833f45-8857-424b-b75c-d09e843a9732"
+export const TEKNISI_ID = "99275883-6088-45da-9669-8d1a3f1a2a67"
+export const SUPERVISI_ID = "4612b2c6-88cf-4b8c-b7ae-3a24b21b7a11"
+
+export const SUP_2 = "²"
+export const SUP_3 = "³"
+export const SUP_4 = "⁴"
+export const SUP_5 = "⁵"
+export const SUP_6 = "⁶"

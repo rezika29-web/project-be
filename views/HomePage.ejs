@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('layouts/HeadLayout'); %>
+  </head>
+  <body>
+    <%- include('layouts/HeaderLayout'); %>
+
+    <p><%= description %></p>
+
+    <div class="content">
+      <div class="column">
+        <h2>API Documentation</h2>
+        <ul>
+          <li>
+            <a href="/api-docs">Swagger UI</a>
+          </li>
+        </ul>
+
+        <h2>Basic Documentation</h2>
+        <ul>
+          <li>
+            <a href="https://www.typescriptlang.org/docs" target="_blank"
+              >TypeScript Documentation</a
+            >
+          </li>
+          <li>
+            <a href="https://react.dev/learn" target="_blank"
+              >React.js Documentation</a
+            >
+          </li>
+        </ul>
+      </div>
+      <div class="column">
+        <h2>Backend Documentation</h2>
+        <ul>
+          <li>
+            <a
+              href="https://expressjs.com/en/starter/installing.html"
+              target="_blank"
+              >Express.js Documentation</a
+            >
+          </li>
+          <li>
+            <a href="https://sequelize.org/docs/v6" target="_blank"
+              >Sequelize Documentation</a
+            >
+          </li>
+          <li>
+            <a
+              href="http://expressjs.com/en/resources/middleware/multer.html"
+              target="_blank"
+              >Multer Documentation</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://github.com/swagger-autogen/swagger-autogen"
+              target="_blank"
+              >Swagger Autogen Documentation</a
+            >
+          </li>
+          <li>
+            <a href="https://github.com/auth0/node-jsonwebtoken" target="_blank"
+              >JWT Documentation</a
+            >
+          </li>
+          <li>
+            <a href="https://ejs.co/#docs" target="_blank">EJS Documentation</a>
+          </li>
+        </ul>
+      </div>
+      <div class="column">
+        <h2>Frontend Documentation</h2>
+        <ul>
+          <li>
+            <a href="https://nextjs.org/docs" target="_blank"
+              >Next.js Documentation</a
+            >
+          </li>
+          <li>
+            <a href="https://formik.org/docs/overview" target="_blank"
+              >Formik Documentation</a
+            >
+          </li>
+          <li>
+            <a href="https://reactstrap.github.io" target="_blank"
+              >Reactstrap Documentation</a
+            >
+          </li>
+          <li>
+            <a href="https://axios-http.com/docs/intro" target="_blank"
+              >Axios Documentation</a
+            >
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="clear: both"></div>
+
+    <%- include('layouts/FooterLayout'); %>
+  </body>
+</html>
