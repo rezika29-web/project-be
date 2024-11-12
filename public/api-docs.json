@@ -62,11 +62,11 @@
               "schema": {
                 "type": "object",
                 "required": [
-                  "username",
+                  "nip",
                   "password"
                 ],
                 "properties": {
-                  "username": {
+                  "nip": {
                     "type": "string"
                   },
                   "password": {

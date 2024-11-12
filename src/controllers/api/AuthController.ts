@@ -108,6 +108,76 @@ export default class AuthController extends ApiController {
     })
   }
 
+  // async handleMyAccount(req: Request, res: Response) {
+  //   /* #swagger.tags = ['Auth'] */
+
+  //   const { User, Role } = DB_PRIMARY
+  //   const { userActive } = res.locals
+
+  //   const user = await User.findByPk(userActive.id, {
+  //     include: [User.associations.role],
+  //   })
+  //   if (!user) throw notFound("User not found")
+
+  //   const role = await Role.findByPk(user.roleId)
+  //   if (!role) throw notFound("Role not found")
+
+  //   const roleData = role.toJSON();
+  //   delete roleData.permissionJson;
+
+  //   const permission: Record<string, PermissionObject> = JSON.parse(role.permissionJson);
+  //   const expandedPermission: Record<string, PermissionObject> = {};
+    
+  //   interface PermissionObject {
+  //     showMenu: boolean;
+  //     create: boolean;
+  //     read: boolean;
+  //     update: boolean;
+  //     delete: boolean;
+  //     export: boolean;
+  //   }
+
+  //   completePermissions.forEach(perm => {
+  //     expandedPermission[perm] = permission[perm] || {
+  //       showMenu: false,
+  //       create: false,
+  //       read: false,
+  //       update: false,
+  //       delete: false,
+  //       export: false,
+  //     };
+  //   });
+
+  //   delete roleData.permissionJson;
+
+  //   // Configure MinIO client
+  //   const minioClient = new Client({
+  //     endPoint: config.envy.MINIO_ENDPOINT,
+  //     port: config.envy.MINIO_PORT,
+  //     useSSL: config.envy.MINIO_USE_SSL === 'true',
+  //     accessKey: config.envy.MINIO_ACCESS_KEY,
+  //     secretKey: config.envy.MINIO_SECRET_KEY,
+  //   });
+
+  //   // Generate presigned URL (1 hour expiry)
+  //   let profpicUrl = null;
+  //   if (user.profilePictureFile) {
+  //     profpicUrl = await minioClient.presignedGetObject('bpsdm', user.profilePictureFile, 60 * 60);
+  //   }
+
+  //   res.json({
+  //     message: "Read success",
+  //     user: {
+  //       ...user.toJSON(),
+  //       profilePictureFile: profpicUrl,
+  //     },
+  //     role: {
+  //       ...roleData,
+  //       permission: expandedPermission
+  //     },
+  //   })
+  // }
+
   async handleUpdateMyAccount(req: Request, res: Response) {
     /* 
     #swagger.tags = ['Auth']
