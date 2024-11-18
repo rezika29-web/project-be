@@ -14,6 +14,7 @@ export class RoleModel extends Model<
 > {
   declare id: string
   declare roleName: string
+  declare description: string
   declare menu: JSON
   declare cornerMenu: JSON
   declare createdAt: CreationOptional<Date>
@@ -28,6 +29,10 @@ function load(sequelize: Sequelize) {
         primaryKey: true,
       },
       roleName: {
+        type: new DataTypes.STRING(100),
+        allowNull: false,
+      },
+      description: {
         type: new DataTypes.STRING(100),
         allowNull: false,
       },

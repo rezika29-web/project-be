@@ -31,6 +31,13 @@ module.exports = {
         {
           id: ADMIN_ID,
           roleName: "Admin",
+          description: "Super Admin",
+          createdAt: new Date(),
+        },
+        {
+          id: KEPALA_ID,
+          roleName: "Kabag",
+          description: "Kabag Biro Umum",
           createdAt: new Date(),
         },
       ],

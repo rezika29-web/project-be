@@ -1,14 +1,16 @@
-import { Sequelize } from "sequelize"
-import config from "../config/AllConfig"
-import AllModel from "../models/AllModel"
+import { Sequelize } from "sequelize";
+import config from "../config/AllConfig";
+import AllModel from "../models/AllModel";
 
 export class DbHelper {
-
   connectAndGetModels() {
     const {
       DB_NAME,
       DB_USERNAME,
       DB_PASSWORD,
+      DBSIPINTAS_NAME,
+      DBSIPINTAS_USERNAME,
+      DBSIPINTAS_PASSWORD,
       DB_DIALECT,
       DB_HOST,
       DB_PORT,
@@ -16,12 +18,15 @@ export class DbHelper {
       DB_POOL_MIN,
       DB_POOL_ACQUIRE,
       DB_POOL_IDLE,
-    } = config.envy
+    } = config.envy;
 
-    console.log('data db', {
+    console.log("data db", {
       DB_NAME,
       DB_USERNAME,
       DB_PASSWORD,
+      DBSIPINTAS_NAME,
+      DBSIPINTAS_USERNAME,
+      DBSIPINTAS_PASSWORD,
       DB_DIALECT,
       DB_HOST,
       DB_PORT,
@@ -29,32 +34,39 @@ export class DbHelper {
       DB_POOL_MIN,
       DB_POOL_ACQUIRE,
       DB_POOL_IDLE,
-    })
+    });
 
-    const sequelize = new Sequelize(
-      DB_NAME, 
-      DB_USERNAME, 
-      DB_PASSWORD, {
-        dialect: DB_DIALECT,
-        host: DB_HOST,
-        port: DB_PORT,
-        pool: {
-          max: DB_POOL_MAX,
-          min: DB_POOL_MIN,
-          acquire: DB_POOL_ACQUIRE,
-          idle: DB_POOL_IDLE,
-        }
-      })
+    const sequelize = new Sequelize(DB_NAME, DB_USERNAME, DB_PASSWORD, {
+      dialect: DB_DIALECT,
+      host: DB_HOST,
+      port: DB_PORT,
+      pool: {
+        max: DB_POOL_MAX,
+        min: DB_POOL_MIN,
+        acquire: DB_POOL_ACQUIRE,
+        idle: DB_POOL_IDLE,
+      },
+    });
+    const sequelizes = new Sequelize(DBSIPINTAS_NAME, DBSIPINTAS_USERNAME, DBSIPINTAS_PASSWORD, {
+      dialect: DB_DIALECT,
+      host: DB_HOST,
+      port: DB_PORT,
+      pool: {
+        max: DB_POOL_MAX,
+        min: DB_POOL_MIN,
+        acquire: DB_POOL_ACQUIRE,
+        idle: DB_POOL_IDLE,
+      },
+    });
 
-    const allModel = new AllModel()
-    const models = allModel.load(sequelize)
-    
+    const allModel = new AllModel();
+    const models = allModel.load(sequelize);
+
     return {
       sequelize,
       ...models,
-    }
+    };
   }
-
 }
 
-export const dbHelper = new DbHelper()
+export const dbHelper = new DbHelper();

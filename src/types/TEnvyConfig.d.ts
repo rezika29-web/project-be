@@ -14,6 +14,9 @@ interface TEnvyConfig {
   DB_NAME: string
   DB_USERNAME: string
   DB_PASSWORD: string
+  DBSIPINTAS_NAME: string
+  DBSIPINTAS_USERNAME: string
+  DBSIPINTAS_PASSWORD: string
   DB_POOL_MAX: number
   DB_POOL_MIN: number
   DB_POOL_ACQUIRE: number

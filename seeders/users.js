@@ -21,10 +21,8 @@ module.exports = {
       [
         {
           id: "0cda3cdf-dcf9-4c30-8f35-606a2188ee8a",
-          firstName: "Septiandri",
-          lastName: "Rezika",
+          fullName: "Septiandri",
           photo: null,
-          username: "admin",
           nip: "11111",
           phoneNumber: "0123",
           password,
@@ -33,14 +31,12 @@ module.exports = {
         },
         {
           id: "e29fb789-f7b0-4881-8d64-48d9da37772b",
-          firstName: "Boby",
-          lastName: "Suhendra",
+          fullName: "Boby Suhendra",
           photo: null,
-          username: "boby",
           nip: "19851008201001015",
           phoneNumber: "0123",
           password,
-          roleId: ADMIN_ID,
+          roleId: KEPALA_ID,
           createdAt: new Date(),
         },
       ],

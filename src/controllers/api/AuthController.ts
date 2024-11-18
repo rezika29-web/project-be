@@ -59,11 +59,9 @@ export default class AuthController extends ApiController {
     const accessToken = jwt.sign(
       {
         id: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
+        fullName: user.fullName,
         photo: user?.photo,
         phoneNumber: user?.phoneNumber,
-        username: user.username,
         nip: user.nip,
         roleId: user.roleId,
         role: user.role,
@@ -105,6 +103,23 @@ export default class AuthController extends ApiController {
     res.json({
       message: "Read My Account success",
       userActive: user,
+    })
+  }
+  async handleGetMyAccount(req: Request, res: Response) {
+    /* #swagger.tags = ['Auth'] */
+
+    const { User } = DB_PRIMARY
+    const { userActive } = res.locals
+
+    const users = await User.findAll({
+      where: { id: userActive.id },
+      include: [User.associations.role]
+    });
+    if (!users) throw notFound("User not found")
+
+    res.json({
+      message: "Read My Account success",
+      userActive: users,
     })
   }
 
@@ -187,18 +202,12 @@ export default class AuthController extends ApiController {
         "application/json": {
           schema: {
             type: "object",
-            required: ["firstName", "username", "nip", "roleId"],
+            required: ["fullName", "nip", "roleId"],
             properties: {
-              firstName: {
-                type: "string",
-              },
-              lastName: {
+              fullName: {
                 type: "string",
               },
               photo: {
-                type: "string",
-              },
-              username: {
                 type: "string",
               },
               nip: {
@@ -217,26 +226,13 @@ export default class AuthController extends ApiController {
     const { userActive } = res.locals
 
     const { id } = userActive
-    const { firstName, lastName, photo, phoneNumber, username, nip, roleId } = req.body
+    const { fullName, photo, phoneNumber, nip, roleId } = req.body
     const { User, Role } = DB_PRIMARY
 
     const user = await User.findByPk(id)
     if (!user) throw notFound("User not found")
 
-    if (!firstName) throw badRequest("First Name required")
-    if (!username) throw badRequest("Username required")
-
-    if (username !== user.username) {
-      const userByUsername = await User.findOne({
-        where: {
-          username,
-        },
-      })
-
-      if (userByUsername) {
-        throw badRequest("A User with the same Username already exists")
-      }
-    }
+    if (!fullName) throw badRequest("First Name required")
 
     if (!nip) throw badRequest("nip required")
     if (!phoneNumber) throw badRequest("Phone Number required")
@@ -264,11 +260,9 @@ export default class AuthController extends ApiController {
 
     await user.update({
       id,
-      firstName,
-      lastName,
+      fullName,
       photo,
       phoneNumber,
-      username,
       nip,
       roleId,
     })

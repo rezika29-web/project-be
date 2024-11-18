@@ -8,29 +8,18 @@ import { UserModel } from "../../models/UserModel";
 
 export default class UserController extends ApiController {
   buildCriteria({
-    firstName,
-    lastName,
-    username,
+    fullName,
     nip,
     roleId,
     keyword,
   }: Partial<UserModel> & { keyword?: string }) {
     let criteria = {};
 
-    if (firstName) {
+    if (fullName) {
       criteria = {
         ...criteria,
-        firstName: {
-          [Op.like]: `${firstName}%`,
-        },
-      };
-    }
-
-    if (lastName) {
-      criteria = {
-        ...criteria,
-        lastName: {
-          [Op.like]: `${lastName}%`,
+        fullName: {
+          [Op.like]: `${fullName}%`,
         },
       };
     }
@@ -40,15 +29,6 @@ export default class UserController extends ApiController {
         ...criteria,
         nip: {
           [Op.like]: `${nip}%`,
-        },
-      };
-    }
-
-    if (username) {
-      criteria = {
-        ...criteria,
-        username: {
-          [Op.like]: `${username}%`,
         },
       };
     }
@@ -65,17 +45,7 @@ export default class UserController extends ApiController {
         ...criteria,
         [Op.or]: [
           {
-            firstName: {
-              [Op.like]: `${keyword}%`,
-            },
-          },
-          {
-            lastName: {
-              [Op.like]: `${keyword}%`,
-            },
-          },
-          {
-            username: {
+            fullName: {
               [Op.like]: `${keyword}%`,
             },
           },
@@ -99,7 +69,7 @@ export default class UserController extends ApiController {
     const users = await User.findAll({
       attributes: { exclude: ["password"] },
       where,
-      order: [["firstName", "ASC"]],
+      order: [["fullName", "ASC"]],
       // include: [User.associations.role],
     });
 
@@ -125,7 +95,7 @@ export default class UserController extends ApiController {
       attributes: { exclude: ["password"] },
       where,
       include: [User.associations.role],
-      order: [["firstName", "ASC"]],
+      order: [["fullName", "ASC"]],
       offset,
       limit,
     });
@@ -214,18 +184,12 @@ export default class UserController extends ApiController {
         "application/json": {
           schema: {
             type: "object",
-            required: ["firstName", "username", "nip", "password", "retypePassword", "roleId"],
+            required: ["fullName", "", "nip", "password", "retypePassword", "roleId"],
             properties: {
-              firstName: {
-                type: "string",
-              },
-              lastName: {
+              fullName: {
                 type: "string",
               },
               photo: {
-                type: "string",
-              },
-              username: {
                 type: "string",
               },
               nip: {
@@ -248,9 +212,7 @@ export default class UserController extends ApiController {
     */
 
     const {
-      firstName,
-      lastName,
-      username,
+      fullName,
       nip,
       phoneNumber,
       password,
@@ -262,27 +224,26 @@ export default class UserController extends ApiController {
 
     // Validate
 
-    if (!firstName) throw badRequest("First Name required");
+    if (!fullName) throw badRequest("Full Name required");
 
-    if (!username) throw badRequest("Username required");
+    if (!nip) throw badRequest("Nip required");
+    if (!nip.isValidNip()) {
+      throw badRequest("Invalid Nip format");
+    }
 
-    const userByUsername = await User.findOne({
+    const userBy = await User.findOne({
       where: {
-        username,
+        nip,
       },
     });
 
-    if (userByUsername) {
-      throw badRequest("A User with the same Username already exists");
+    if (userBy) {
+      throw badRequest("A NIP with the same  already exists");
     }
 
     if (!phoneNumber) throw badRequest("Phone Number required");
 
-    if (!nip) throw badRequest("Nip required");
 
-    if (!nip.isValidNip()) {
-      throw badRequest("Invalid Nip format");
-    }
 
     const userByNip = await User.findOne({
       where: {
@@ -313,9 +274,7 @@ export default class UserController extends ApiController {
 
     await User.create({
       id,
-      firstName,
-      lastName,
-      username,
+      fullName,
       nip,
       phoneNumber,
       password: newPassword,
@@ -337,15 +296,9 @@ export default class UserController extends ApiController {
         "application/json": {
           schema: {
             type: "object",
-            required: ["firstName", "username", "nip", "roleId"],
+            required: ["fullName","nip", "roleId"],
             properties: {
-              firstName: {
-                type: "string",
-              },
-              lastName: {
-                type: "string",
-              },
-              username: {
+              fullName: {
                 type: "string",
               },
               nip: {
@@ -362,28 +315,15 @@ export default class UserController extends ApiController {
     */
 
     const { id } = req.params;
-    const { firstName, lastName, username, nip, roleId, phoneNumber } =
+    const { fullName, nip, roleId, phoneNumber } =
       req.body;
     const { User, Role } = DB_PRIMARY;
 
     const user = await User.findByPk(id);
     if (!user) throw notFound("User not found");
 
-    if (!firstName) throw badRequest("First Name required");
-    if (!username) throw badRequest("Username required");
+    if (!fullName) throw badRequest("Full Name required");
     if (!phoneNumber) throw badRequest("Phone Number required");
-
-    if (username !== user.username) {
-      const userByUsername = await User.findOne({
-        where: {
-          username,
-        },
-      });
-
-      if (userByUsername) {
-        throw badRequest("A User with the same Username already exists");
-      }
-    }
 
     if (!nip) throw badRequest("nip required");
 
@@ -410,9 +350,7 @@ export default class UserController extends ApiController {
 
     await user.update({
       id,
-      firstName,
-      lastName,
-      username,
+      fullName,
       nip,
       phoneNumber,
       roleId,

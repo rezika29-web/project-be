@@ -152,6 +152,19 @@
         }
       }
     },
+    "/v1/auth/get/my-account": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/v1/auth/my-account/update-password": {
       "put": {
         "tags": [
@@ -626,6 +639,19 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/grafik/all": {
+      "get": {
+        "tags": [
+          "Grafik"
+        ],
+        "description": "",
         "responses": {
           "200": {
             "description": "OK"

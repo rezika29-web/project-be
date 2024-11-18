@@ -20,6 +20,11 @@ router.get(
   AuthMiddleware,
   asyncHandler(controller.handleMyAccount.bind(controller))
 )
+router.get(
+  "/auth/get/my-account",
+  AuthMiddleware,
+  asyncHandler(controller.handleGetMyAccount.bind(controller))
+)
 router.put(
   "/auth/my-account",
   AuthMiddleware,

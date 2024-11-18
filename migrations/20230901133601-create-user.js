@@ -10,21 +10,13 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.STRING(50),
       },
-      firstName: {
+      fullName: {
         type: Sequelize.STRING(100),
         allowNull: false,
-      },
-      lastName: {
-        type: Sequelize.STRING(100),
-        allowNull: true,
       },
       photo: {
         type: Sequelize.TEXT,
         allowNull: true,
-      },
-      username: {
-        type: Sequelize.STRING(100),
-        allowNull: false,
       },
       nip: {
         type: Sequelize.STRING(100),

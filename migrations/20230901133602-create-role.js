@@ -14,6 +14,10 @@ module.exports = {
         type: Sequelize.STRING(100),
         allowNull: false,
       },
+      description: {
+        type: Sequelize.STRING(100),
+        allowNull: false,
+      },
       menu: {
         type: Sequelize.JSON,
         allowNull: true,

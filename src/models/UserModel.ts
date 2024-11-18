@@ -14,10 +14,8 @@ import { RoleModel } from './RoleModel'
 
 export class UserModel extends Model<InferAttributes<UserModel>, InferCreationAttributes<UserModel>> {
   declare id: string
-  declare firstName: string
-  declare lastName: string
+  declare fullName: string
   declare photo: string
-  declare username: string
   declare nip: string
   declare phoneNumber: string
   declare password: string
@@ -34,21 +32,13 @@ function load(sequelize: Sequelize) {
         type: DataTypes.STRING(50),
         primaryKey: true,
       },
-      firstName: {
+      fullName: {
         type: new DataTypes.STRING(100),
         allowNull: false,
-      },
-      lastName: {
-        type: new DataTypes.STRING(100),
-        allowNull: true,
       },
       photo: {
         type: new DataTypes.STRING(100),
         allowNull: true,
-      },
-      username: {
-        type: new DataTypes.STRING(100),
-        allowNull: false,
       },
       password: {
         type: new DataTypes.STRING(100),
