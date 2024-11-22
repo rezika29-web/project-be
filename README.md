@@ -1,6 +1,6 @@
-# Kemenhub BE
+# Biro Umum BE
 
-Project web service API untuk Kemenhub.
+Project web service API untuk Biro Umum.
 
 ## Quick Start
 
