@@ -18,5 +18,6 @@
          "source": "/(.*)",
          "destination": "/" 
       }
-    ] 
+    ] ,
+    "buildCommand": "node build"
   }
