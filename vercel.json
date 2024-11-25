@@ -10,13 +10,13 @@
       
       {
         "src": "/(.*)",
-        "destination": "/"
+        "dest": "/"
       }
     ],
     "rewrites": [
       {
          "source": "/(.*)",
-         "destination": "/" 
+         "dest": "/" 
       }
     ] ,
     "buildCommand": "node build"
