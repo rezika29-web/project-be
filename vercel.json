@@ -9,14 +9,12 @@
     "routes": [
       
       {
-        "src": "/(.*)",
-        "dest": "/"
+        "src": "/(.*)"
       }
     ],
     "rewrites": [
       {
-         "source": "/(.*)",
-         "dest": "/" 
+         "source": "/(.*)"
       }
     ] ,
     "buildCommand": "node build"
