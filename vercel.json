@@ -10,7 +10,13 @@
       
       {
         "src": "/(.*)",
-        "dest": "/"
+        "destination": "/"
       }
-    ]
+    ],
+    "rewrites": [
+      {
+         "source": "/(.*)",
+         "destination": "/" 
+      }
+    ] 
   }
