@@ -32,7 +32,7 @@ const app: Express = express()
 app.use(cors(
   {
     origin: ["*"], // Tambahkan domain frontend
-    // credentials: true, 
+    credentials: true, 
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Metode HTTP yang diizinkan
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"], // Header yang diizinkan
   }
