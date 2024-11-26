@@ -27,6 +27,7 @@
     "express-async-handler": "^1.2.0",
     "formidable": "^3.5.1",
     "helmet": "^7.1.0",
+    "http": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
     "media-typer": "^1.1.0",
     "mysql2": "3.0.0",
