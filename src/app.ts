@@ -29,7 +29,6 @@ globalThis.DB_PRIMARY = connAndModels
 const { APP_NAME, APP_VERSION, HOST_PORT } = config.envy
 const app: Express = express()
 
-app.use(helmet())
 app.use(cors(
   {
     origin: ["*"], // Tambahkan domain frontend
@@ -38,6 +37,7 @@ app.use(cors(
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"], // Header yang diizinkan
   }
 ))
+app.use(helmet())
 
 app.use(
   express.urlencoded({
