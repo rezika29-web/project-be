@@ -25,8 +25,13 @@ globalThis.DB_PRIMARY = connAndModels;
 // API setup
 const { APP_NAME, APP_VERSION, HOST_PORT } = AllConfig_1.default.envy;
 const app = (0, express_1.default)();
+app.use((0, cors_1.default)({
+    origin: "*",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"], // Header yang diizinkan
+}));
 app.use((0, helmet_1.default)());
-app.use((0, cors_1.default)());
 app.use(express_1.default.urlencoded({
     extended: true,
     // limit: "50mb",
