@@ -30,7 +30,14 @@ const { APP_NAME, APP_VERSION, HOST_PORT } = config.envy
 const app: Express = express()
 
 app.use(helmet())
-app.use(cors())
+app.use(cors(
+  {
+    origin: ["*"], // Tambahkan domain frontend
+    // credentials: true, 
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Metode HTTP yang diizinkan
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"], // Header yang diizinkan
+  }
+))
 
 app.use(
   express.urlencoded({
