@@ -301,6 +301,9 @@ export default class UserController extends ApiController {
               fullName: {
                 type: "string",
               },
+              phoneNumber: {
+                type: "string",
+              },
               nip: {
                 type: "string",
               },

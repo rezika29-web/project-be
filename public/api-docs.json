@@ -595,19 +595,16 @@
               "schema": {
                 "type": "object",
                 "required": [
-                  "firstName",
-                  "username",
+                  "fullName",
+                  "phoneNumber",
                   "nip",
                   "roleId"
                 ],
                 "properties": {
-                  "firstName": {
+                  "fullName": {
                     "type": "string"
                   },
-                  "lastName": {
-                    "type": "string"
-                  },
-                  "username": {
+                  "phoneNumber": {
                     "type": "string"
                   },
                   "nip": {
