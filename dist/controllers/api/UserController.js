@@ -258,6 +258,9 @@ class UserController extends ApiController_1.default {
                       fullName: {
                         type: "string",
                       },
+                      phoneNumber: {
+                        type: "string",
+                      },
                       nip: {
                         type: "string",
                       },
@@ -271,6 +274,7 @@ class UserController extends ApiController_1.default {
             }
             */
             const { id } = req.params;
+            console.log(id);
             const { fullName, nip, roleId, phoneNumber } = req.body;
             const { User, Role } = DB_PRIMARY;
             const user = yield User.findByPk(id);
