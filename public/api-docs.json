@@ -486,18 +486,18 @@
               "schema": {
                 "type": "object",
                 "required": [
-                  "firstName",
-                  "username",
+                  "fullName",
+                  "phoneNumber",
                   "nip",
                   "password",
                   "retypePassword",
                   "roleId"
                 ],
                 "properties": {
-                  "firstName": {
+                  "fullName": {
                     "type": "string"
                   },
-                  "lastName": {
+                  "phoneNumber": {
                     "type": "string"
                   },
                   "photo": {
