@@ -317,17 +317,18 @@ export default class UserController extends ApiController {
     }
     */
 
+    res.status(201).json({
+      message: "Create new data success",
+      req,
+    });
+
     const { id } = req.params;
     
     const { fullName, nip, roleId, phoneNumber } =
     req.body;
     const { User, Role } = DB_PRIMARY;
-    
     const user = await User.findByPk(id);
-    if (user) res.status(201).json({
-      message: "Create new data success",
-      req,
-    });
+    
     if (!user) throw notFound("User not found");
 
     if (!fullName) throw badRequest("Full Name required");
