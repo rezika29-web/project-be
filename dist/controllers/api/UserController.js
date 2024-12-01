@@ -273,10 +273,40 @@ class UserController extends ApiController_1.default {
               },
             }
             */
-            res.status(201).json({
-                message: "Create new data success",
-                req,
-            });
+            try {
+                const { id } = req.params;
+                const { fullName, nip, roleId, phoneNumber } = req.body;
+                const { User, Role } = DB_PRIMARY;
+                const user = yield User.findByPk(id);
+                if (!user)
+                    throw (0, ErrorHelper_1.notFound)("User not found");
+                if (!fullName)
+                    throw (0, ErrorHelper_1.badRequest)("Full Name required");
+                if (!phoneNumber)
+                    throw (0, ErrorHelper_1.badRequest)("Phone Number required");
+                if (!nip)
+                    throw (0, ErrorHelper_1.badRequest)("NIP required");
+                if (!roleId)
+                    throw (0, ErrorHelper_1.badRequest)("Role ID required");
+                const role = yield Role.findByPk(roleId);
+                if (!role)
+                    throw (0, ErrorHelper_1.notFound)("Role not found");
+                if (nip !== user.nip) {
+                    const userByNip = yield User.findOne({ where: { nip } });
+                    if (userByNip)
+                        throw (0, ErrorHelper_1.badRequest)("NIP already exists");
+                }
+                yield user.update({ fullName, nip, phoneNumber, roleId });
+                res.json({ message: "Update data success" });
+            }
+            catch (error) {
+                if (error instanceof Error) {
+                    res.status(500).json({ message: error.message });
+                }
+                else {
+                    res.status(500).json({ message: 'An unknown error occurred' });
+                }
+            }
             // const { id } = req.params;
             // const { fullName, nip, roleId, phoneNumber } =
             // req.body;
