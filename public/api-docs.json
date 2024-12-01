@@ -503,9 +503,6 @@
                   "photo": {
                     "type": "string"
                   },
-                  "username": {
-                    "type": "string"
-                  },
                   "nip": {
                     "type": "string"
                   },
