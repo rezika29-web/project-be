@@ -318,13 +318,13 @@ export default class UserController extends ApiController {
     */
 
     const { id } = req.params;
-    console.log(id);
     
     const { fullName, nip, roleId, phoneNumber } =
-      req.body;
+    req.body;
     const { User, Role } = DB_PRIMARY;
-
+    
     const user = await User.findByPk(id);
+    if (user) throw notFound(req)
     if (!user) throw notFound("User not found");
 
     if (!fullName) throw badRequest("Full Name required");
