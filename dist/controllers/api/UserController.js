@@ -273,47 +273,45 @@ class UserController extends ApiController_1.default {
               },
             }
             */
-            const { id } = req.params;
-            console.log(id);
-            const { fullName, nip, roleId, phoneNumber } = req.body;
-            const { User, Role } = DB_PRIMARY;
-            const user = yield User.findByPk(id);
-            if (!user)
-                throw (0, ErrorHelper_1.notFound)("User not found");
-            if (!fullName)
-                throw (0, ErrorHelper_1.badRequest)("Full Name required");
-            if (!phoneNumber)
-                throw (0, ErrorHelper_1.badRequest)("Phone Number required");
-            if (!nip)
-                throw (0, ErrorHelper_1.badRequest)("nip required");
-            if (!nip.isValidNip()) {
-                throw (0, ErrorHelper_1.badRequest)("Invalid Nip format");
-            }
-            if (nip !== user.nip) {
-                const userByNip = yield User.findOne({
-                    where: {
-                        nip,
-                    },
-                });
-                if (userByNip) {
-                    throw (0, ErrorHelper_1.badRequest)("A User with the same Nip already exists");
-                }
-            }
-            if (!roleId)
-                throw (0, ErrorHelper_1.badRequest)("Role ID required");
-            const role = yield Role.findByPk(roleId);
-            if (!role)
-                throw (0, ErrorHelper_1.notFound)("Role not found");
-            yield user.update({
-                id,
-                fullName,
-                nip,
-                phoneNumber,
-                roleId,
+            res.status(201).json({
+                message: "Create new data success",
+                req,
             });
-            res.json({
-                message: "Update data success",
-            });
+            // const { id } = req.params;
+            // const { fullName, nip, roleId, phoneNumber } =
+            // req.body;
+            // const { User, Role } = DB_PRIMARY;
+            // const user = await User.findByPk(id);
+            // if (!user) throw notFound("User not found");
+            // if (!fullName) throw badRequest("Full Name required");
+            // if (!phoneNumber) throw badRequest("Phone Number required");
+            // if (!nip) throw badRequest("nip required");
+            // if (!nip.isValidNip()) {
+            //   throw badRequest("Invalid Nip format");
+            // }
+            // if (nip !== user.nip) {
+            //   const userByNip = await User.findOne({
+            //     where: {
+            //       nip,
+            //     },
+            //   });
+            //   if (userByNip) {
+            //     throw badRequest("A User with the same Nip already exists");
+            //   }
+            // }
+            // if (!roleId) throw badRequest("Role ID required");
+            // const role = await Role.findByPk(roleId);
+            // if (!role) throw notFound("Role not found");
+            // await user.update({
+            //   id,
+            //   fullName,
+            //   nip,
+            //   phoneNumber,
+            //   roleId,
+            // });
+            // res.json({
+            //   message: "Update data success",
+            // });
         });
     }
     handleResetPassword(req, res) {

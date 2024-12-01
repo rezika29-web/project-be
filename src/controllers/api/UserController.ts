@@ -322,52 +322,52 @@ export default class UserController extends ApiController {
       req,
     });
 
-    const { id } = req.params;
+    // const { id } = req.params;
     
-    const { fullName, nip, roleId, phoneNumber } =
-    req.body;
-    const { User, Role } = DB_PRIMARY;
-    const user = await User.findByPk(id);
+    // const { fullName, nip, roleId, phoneNumber } =
+    // req.body;
+    // const { User, Role } = DB_PRIMARY;
+    // const user = await User.findByPk(id);
     
-    if (!user) throw notFound("User not found");
+    // if (!user) throw notFound("User not found");
 
-    if (!fullName) throw badRequest("Full Name required");
-    if (!phoneNumber) throw badRequest("Phone Number required");
+    // if (!fullName) throw badRequest("Full Name required");
+    // if (!phoneNumber) throw badRequest("Phone Number required");
 
-    if (!nip) throw badRequest("nip required");
+    // if (!nip) throw badRequest("nip required");
 
-    if (!nip.isValidNip()) {
-      throw badRequest("Invalid Nip format");
-    }
+    // if (!nip.isValidNip()) {
+    //   throw badRequest("Invalid Nip format");
+    // }
 
-    if (nip !== user.nip) {
-      const userByNip = await User.findOne({
-        where: {
-          nip,
-        },
-      });
+    // if (nip !== user.nip) {
+    //   const userByNip = await User.findOne({
+    //     where: {
+    //       nip,
+    //     },
+    //   });
 
-      if (userByNip) {
-        throw badRequest("A User with the same Nip already exists");
-      }
-    }
+    //   if (userByNip) {
+    //     throw badRequest("A User with the same Nip already exists");
+    //   }
+    // }
 
-    if (!roleId) throw badRequest("Role ID required");
+    // if (!roleId) throw badRequest("Role ID required");
 
-    const role = await Role.findByPk(roleId);
-    if (!role) throw notFound("Role not found");
+    // const role = await Role.findByPk(roleId);
+    // if (!role) throw notFound("Role not found");
 
-    await user.update({
-      id,
-      fullName,
-      nip,
-      phoneNumber,
-      roleId,
-    });
+    // await user.update({
+    //   id,
+    //   fullName,
+    //   nip,
+    //   phoneNumber,
+    //   roleId,
+    // });
 
-    res.json({
-      message: "Update data success",
-    });
+    // res.json({
+    //   message: "Update data success",
+    // });
   }
 
   async handleResetPassword(req: Request, res: Response) {
