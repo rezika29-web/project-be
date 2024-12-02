@@ -224,9 +224,9 @@ export default class UserController extends ApiController {
       if (!fullName) throw badRequest("Full Name required");
       if (!nip) throw badRequest("NIP required");
   
-      if (!isValidNip(nip)) {
-        throw badRequest("Invalid NIP format");
-      }
+      // if (!isValidNip(nip)) {
+      //   throw badRequest("Invalid NIP format");
+      // }
   
       const userByNip = await User.findOne({ where: { nip } });
       if (userByNip) {

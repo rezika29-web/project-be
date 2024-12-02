@@ -197,9 +197,9 @@ class UserController extends ApiController_1.default {
                     throw (0, ErrorHelper_1.badRequest)("Full Name required");
                 if (!nip)
                     throw (0, ErrorHelper_1.badRequest)("NIP required");
-                if (!isValidNip(nip)) {
-                    throw (0, ErrorHelper_1.badRequest)("Invalid NIP format");
-                }
+                // if (!isValidNip(nip)) {
+                //   throw badRequest("Invalid NIP format");
+                // }
                 const userByNip = yield User.findOne({ where: { nip } });
                 if (userByNip) {
                     throw (0, ErrorHelper_1.badRequest)("A User with the same NIP already exists");
