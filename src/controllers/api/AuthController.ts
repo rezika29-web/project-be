@@ -48,8 +48,14 @@ export default class AuthController extends ApiController {
       // Cari user berdasarkan NIP
       const user = await User.findOne({
         where: { nip },
-        include: [User.associations.role],
+        // include: [User.associations.role],
       });
+      // const user = await User.findOne({
+      //   where: {
+      //     [Op.or]: [{ nip }, { nip: nip }],
+      //   },
+      //   include: [User.associations.role],
+      // });
 
       res.status(200).json({
         message: "Login successful",
