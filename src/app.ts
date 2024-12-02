@@ -28,10 +28,22 @@ globalThis.DB_PRIMARY = connAndModels
 
 const { APP_NAME, APP_VERSION, HOST_PORT } = config.envy
 const app: Express = express()
+const allowedOrigins = [
+  "https://project-be-production-81c4.up.railway.app",
+  "biroumumsumbar.com",
+  "https://project-fe-production.up.railway.app",
+  "http://localhost:4000",
+];
 
 app.use(cors(
   {
-    origin: "*", // Tambahkan domain frontend
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true, 
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Metode HTTP yang diizinkan
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"], // Header yang diizinkan
