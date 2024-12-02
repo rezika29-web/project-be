@@ -21,7 +21,7 @@ const ApiController_1 = __importDefault(require("../../core/ApiController"));
 const ErrorHelper_1 = require("../../helpers/ErrorHelper");
 const { ACCESS_KEY, ACCESS_EXP } = AllConfig_1.default.envy;
 class AuthController extends ApiController_1.default {
-    handleLogin(req, res) {
+    handleLogin(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             /*
             #swagger.tags = ['Auth']
@@ -45,43 +45,55 @@ class AuthController extends ApiController_1.default {
               },
             }
             */
-            const { nip, password } = req.body;
-            if (!nip)
-                throw (0, ErrorHelper_1.badRequest)("nip required");
-            if (!password)
-                throw (0, ErrorHelper_1.badRequest)("Password required");
-            const { User } = DB_PRIMARY;
-            const user = yield User.findOne({
-                where: {
-                    [sequelize_1.Op.or]: [{ nip }, { nip: nip }],
-                },
-                include: [User.associations.role],
-            });
-            if (!user)
-                throw (0, ErrorHelper_1.notFound)("User not found");
-            const encryptedPassword = (0, sha1_1.default)(password);
-            if (user.password !== encryptedPassword) {
-                throw (0, ErrorHelper_1.badRequest)("Invalid password");
+            try {
+                const { nip, password } = req.body;
+                if (!nip)
+                    throw (0, ErrorHelper_1.badRequest)("nip required");
+                if (!password)
+                    throw (0, ErrorHelper_1.badRequest)("Password required");
+                const { User } = DB_PRIMARY;
+                const user = yield User.findOne({
+                    where: {
+                        [sequelize_1.Op.or]: [{ nip }, { nip: nip }],
+                    },
+                    include: [User.associations.role],
+                });
+                if (!user)
+                    throw (0, ErrorHelper_1.notFound)("User not found");
+                const encryptedPassword = (0, sha1_1.default)(password);
+                if (user.password !== encryptedPassword) {
+                    throw (0, ErrorHelper_1.badRequest)("Invalid password");
+                }
+                const accessToken = jsonwebtoken_1.default.sign({
+                    id: user.id,
+                    fullName: user.fullName,
+                    photo: user === null || user === void 0 ? void 0 : user.photo,
+                    phoneNumber: user === null || user === void 0 ? void 0 : user.phoneNumber,
+                    nip: user.nip,
+                    roleId: user.roleId,
+                    role: user.role,
+                }, ACCESS_KEY, { expiresIn: ACCESS_EXP });
+                const duration = ACCESS_EXP;
+                const { iat, exp } = jsonwebtoken_1.default.verify(accessToken, ACCESS_KEY);
+                res.cookie("accessToken", accessToken);
+                res.json({
+                    message: "Login success",
+                    accessToken,
+                    duration,
+                    iat,
+                    exp,
+                });
             }
-            const accessToken = jsonwebtoken_1.default.sign({
-                id: user.id,
-                fullName: user.fullName,
-                photo: user === null || user === void 0 ? void 0 : user.photo,
-                phoneNumber: user === null || user === void 0 ? void 0 : user.phoneNumber,
-                nip: user.nip,
-                roleId: user.roleId,
-                role: user.role,
-            }, ACCESS_KEY, { expiresIn: ACCESS_EXP });
-            const duration = ACCESS_EXP;
-            const { iat, exp } = jsonwebtoken_1.default.verify(accessToken, ACCESS_KEY);
-            res.cookie("accessToken", accessToken);
-            res.json({
-                message: "Login success",
-                accessToken,
-                duration,
-                iat,
-                exp,
-            });
+            catch (error) {
+                if (error instanceof Error) {
+                    console.error("Login error:", error.message);
+                    next(error);
+                }
+                else {
+                    console.error("Unknown error:", error);
+                    next(new Error("Internal server error"));
+                }
+            }
         });
     }
     handleLogout(req, res) {
@@ -114,7 +126,7 @@ class AuthController extends ApiController_1.default {
             const { userActive } = res.locals;
             const users = yield User.findAll({
                 where: { id: userActive.id },
-                include: [User.associations.role]
+                include: [User.associations.role],
             });
             if (!users)
                 throw (0, ErrorHelper_1.notFound)("User not found");

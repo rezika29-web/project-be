@@ -1,17 +1,17 @@
-import { Request, Response } from "express"
-import { v4 as uuidv4 } from "uuid"
-import { Op } from "sequelize"
-import jwt from "jsonwebtoken"
-import sha1 from "sha1"
-import config from "../../config/AllConfig"
-import ApiController from "../../core/ApiController"
-import { badRequest, notFound } from "../../helpers/ErrorHelper"
-import UserController from "./UserController"
+import { NextFunction, Request, Response } from "express";
+import { v4 as uuidv4 } from "uuid";
+import { Op } from "sequelize";
+import jwt from "jsonwebtoken";
+import sha1 from "sha1";
+import config from "../../config/AllConfig";
+import ApiController from "../../core/ApiController";
+import { badRequest, notFound } from "../../helpers/ErrorHelper";
+import UserController from "./UserController";
 
-const { ACCESS_KEY, ACCESS_EXP } = config.envy
+const { ACCESS_KEY, ACCESS_EXP } = config.envy;
 
 export default class AuthController extends ApiController {
-  async handleLogin(req: Request, res: Response) {
+  async handleLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
     /* 
     #swagger.tags = ['Auth']
     #swagger.requestBody = {
@@ -34,93 +34,102 @@ export default class AuthController extends ApiController {
       },
     }
     */
+    try {
+      const { nip, password } = req.body;
 
-    const { nip, password } = req.body
+      if (!nip) throw badRequest("nip required");
+      if (!password) throw badRequest("Password required");
 
-    if (!nip) throw badRequest("nip required")
-    if (!password) throw badRequest("Password required")
+      const { User } = DB_PRIMARY;
 
-    const { User } = DB_PRIMARY
+      const user = await User.findOne({
+        where: {
+          [Op.or]: [{ nip }, { nip: nip }],
+        },
+        include: [User.associations.role],
+      });
 
-    const user = await User.findOne({
-      where: {
-        [Op.or]: [{ nip }, { nip: nip }],
-      },
-      include: [User.associations.role],
-    })
+      if (!user) throw notFound("User not found");
 
-    if (!user) throw notFound("User not found")
+      const encryptedPassword = sha1(password);
+      if (user.password !== encryptedPassword) {
+        throw badRequest("Invalid password");
+      }
 
-    const encryptedPassword = sha1(password)
-    if (user.password !== encryptedPassword) {
-      throw badRequest("Invalid password")
+      const accessToken = jwt.sign(
+        {
+          id: user.id,
+          fullName: user.fullName,
+          photo: user?.photo,
+          phoneNumber: user?.phoneNumber,
+          nip: user.nip,
+          roleId: user.roleId,
+          role: user.role,
+        },
+        ACCESS_KEY,
+        { expiresIn: ACCESS_EXP }
+      );
+
+      const duration = ACCESS_EXP;
+      const { iat, exp }: any = jwt.verify(accessToken, ACCESS_KEY);
+
+      res.cookie("accessToken", accessToken);
+      res.json({
+        message: "Login success",
+        accessToken,
+        duration,
+        iat,
+        exp,
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Login error:", error.message);
+        next(error);
+      } else {
+        console.error("Unknown error:", error);
+        next(new Error("Internal server error"));
+      }
     }
-
-    const accessToken = jwt.sign(
-      {
-        id: user.id,
-        fullName: user.fullName,
-        photo: user?.photo,
-        phoneNumber: user?.phoneNumber,
-        nip: user.nip,
-        roleId: user.roleId,
-        role: user.role,
-      },
-      ACCESS_KEY,
-      { expiresIn: ACCESS_EXP }
-    )
-
-    const duration = ACCESS_EXP
-    const { iat, exp }: any = jwt.verify(accessToken, ACCESS_KEY)
-
-    res.cookie("accessToken", accessToken)
-    res.json({
-      message: "Login success",
-      accessToken,
-      duration,
-      iat,
-      exp,
-    })
   }
 
   async handleLogout(req: Request, res: Response) {
     /* #swagger.tags = ['Auth'] */
-    res.cookie("accessToken", null)
-    res.json({ message: "Logout success" })
+    res.cookie("accessToken", null);
+    res.json({ message: "Logout success" });
   }
 
   async handleMyAccount(req: Request, res: Response) {
     /* #swagger.tags = ['Auth'] */
 
-    const { User } = DB_PRIMARY
-    const { userActive } = res.locals
+    const { User } = DB_PRIMARY;
+    const { userActive } = res.locals;
 
     const user = await User.findByPk(userActive.id, {
       include: [User.associations.role],
-    })
-    if (!user) throw notFound("User not found")
+    });
+    if (!user) throw notFound("User not found");
 
     res.json({
       message: "Read My Account success",
       userActive: user,
-    })
+    });
   }
   async handleGetMyAccount(req: Request, res: Response) {
     /* #swagger.tags = ['Auth'] */
 
-    const { User } = DB_PRIMARY
-    const { userActive } = res.locals
+    const { User } = DB_PRIMARY;
+    const { userActive } = res.locals;
 
     const users = await User.findAll({
       where: { id: userActive.id },
-      include: [User.associations.role]
+      include: [User.associations.role],
     });
-    if (!users) throw notFound("User not found")
+    if (!users) throw notFound("User not found");
 
     res.json({
       message: "Read My Account success",
       userActive: users,
-    })
+    });
   }
 
   // async handleMyAccount(req: Request, res: Response) {
@@ -142,7 +151,7 @@ export default class AuthController extends ApiController {
 
   //   const permission: Record<string, PermissionObject> = JSON.parse(role.permissionJson);
   //   const expandedPermission: Record<string, PermissionObject> = {};
-    
+
   //   interface PermissionObject {
   //     showMenu: boolean;
   //     create: boolean;
@@ -223,22 +232,22 @@ export default class AuthController extends ApiController {
     }
     */
 
-    const { userActive } = res.locals
+    const { userActive } = res.locals;
 
-    const { id } = userActive
-    const { fullName, photo, phoneNumber, nip, roleId } = req.body
-    const { User, Role } = DB_PRIMARY
+    const { id } = userActive;
+    const { fullName, photo, phoneNumber, nip, roleId } = req.body;
+    const { User, Role } = DB_PRIMARY;
 
-    const user = await User.findByPk(id)
-    if (!user) throw notFound("User not found")
+    const user = await User.findByPk(id);
+    if (!user) throw notFound("User not found");
 
-    if (!fullName) throw badRequest("First Name required")
+    if (!fullName) throw badRequest("First Name required");
 
-    if (!nip) throw badRequest("nip required")
-    if (!phoneNumber) throw badRequest("Phone Number required")
+    if (!nip) throw badRequest("nip required");
+    if (!phoneNumber) throw badRequest("Phone Number required");
 
     if (!nip.isValidnip()) {
-      throw badRequest("Invalid nip format")
+      throw badRequest("Invalid nip format");
     }
 
     if (nip !== user.nip) {
@@ -246,17 +255,17 @@ export default class AuthController extends ApiController {
         where: {
           nip,
         },
-      })
+      });
 
       if (userBynip) {
-        throw badRequest("A User with the same nip already exists")
+        throw badRequest("A User with the same nip already exists");
       }
     }
 
-    if (!roleId) throw badRequest("Role ID required")
+    if (!roleId) throw badRequest("Role ID required");
 
-    const role = await Role.findByPk(roleId)
-    if (!role) throw notFound("Role not found")
+    const role = await Role.findByPk(roleId);
+    if (!role) throw notFound("Role not found");
 
     await user.update({
       id,
@@ -265,46 +274,46 @@ export default class AuthController extends ApiController {
       phoneNumber,
       nip,
       roleId,
-    })
+    });
 
     res.json({
       message: "Update data success",
-    })
+    });
   }
 
   async handleUpdatePassword(req: Request, res: Response) {
     /* #swagger.tags = ['Auth'] */
 
-    const { userActive } = res.locals
+    const { userActive } = res.locals;
 
-    const { id } = userActive
-    const { oldPassword, newPassword, retypePassword } = req.body
-    const { User, Role } = DB_PRIMARY
+    const { id } = userActive;
+    const { oldPassword, newPassword, retypePassword } = req.body;
+    const { User, Role } = DB_PRIMARY;
 
-    const user = await User.findByPk(id)
-    if (!user) throw notFound("User not found")
+    const user = await User.findByPk(id);
+    if (!user) throw notFound("User not found");
 
-    if (!oldPassword) throw badRequest("Old Password required")
-    if (!newPassword) throw badRequest("New Password required")
-    if (!retypePassword) throw badRequest("retype Password required")
+    if (!oldPassword) throw badRequest("Old Password required");
+    if (!newPassword) throw badRequest("New Password required");
+    if (!retypePassword) throw badRequest("retype Password required");
     if (retypePassword !== newPassword) {
-      throw badRequest("New Password tidak sama dengan Retype Password")
+      throw badRequest("New Password tidak sama dengan Retype Password");
     }
     if (sha1(oldPassword) !== user.password) {
-      throw badRequest("Old Password tidak sama dengan Password tersedia")
+      throw badRequest("Old Password tidak sama dengan Password tersedia");
     }
 
-    const salt = sha1("salt-" + uuidv4())
-    const password = sha1(newPassword + salt)
+    const salt = sha1("salt-" + uuidv4());
+    const password = sha1(newPassword + salt);
 
     await user.update({
       id,
       salt,
       password,
-    })
+    });
 
     res.json({
       message: "Update data success",
-    })
+    });
   }
 }
