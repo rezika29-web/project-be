@@ -33,6 +33,7 @@ const allowedOrigins = [
   "biroumumsumbar.com",
   "https://project-fe-production.up.railway.app",
   "http://localhost:4000",
+  "http://localhost:1234",
 ];
 
 app.use(cors(
