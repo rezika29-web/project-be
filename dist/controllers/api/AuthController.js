@@ -51,6 +51,10 @@ class AuthController extends ApiController_1.default {
                 if (!password)
                     return next((0, ErrorHelper_1.badRequest)("Password is required"));
                 const { User } = DB_PRIMARY;
+                res.status(200).json({
+                    message: "Login successful",
+                    User
+                });
                 // Cari user berdasarkan NIP
                 const user = yield User.findOne({
                     where: { nip },
@@ -62,10 +66,6 @@ class AuthController extends ApiController_1.default {
                 //   },
                 //   include: [User.associations.role],
                 // });
-                res.status(200).json({
-                    message: "Login successful",
-                    user
-                });
                 // if (!user) return next(notFound("User not found"));
                 // // Validasi password
                 // const encryptedPassword = sha1(password);

@@ -44,6 +44,11 @@ export default class AuthController extends ApiController {
       if (!password) return next(badRequest("Password is required"));
 
       const { User } = DB_PRIMARY;
+      res.status(200).json({
+        message: "Login successful",
+        User
+      });
+
 
       // Cari user berdasarkan NIP
       const user = await User.findOne({
@@ -57,11 +62,7 @@ export default class AuthController extends ApiController {
       //   include: [User.associations.role],
       // });
 
-      res.status(200).json({
-        message: "Login successful",
-        user
-      });
-
+      
       // if (!user) return next(notFound("User not found"));
 
       // // Validasi password
