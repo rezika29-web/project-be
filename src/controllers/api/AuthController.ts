@@ -35,114 +35,117 @@ export default class AuthController extends ApiController {
     }
     */
 
-    res.status(200).json({
-      message: "Login successful",
-    });
-    // try {
-    //   const { nip, password } = req.body;
+  
+    try {
+      const { nip, password } = req.body;
 
-    //   // Validasi input
-    //   if (!nip) return next(badRequest("NIP is required"));
-    //   if (!password) return next(badRequest("Password is required"));
+      // Validasi input
+      if (!nip) return next(badRequest("NIP is required"));
+      if (!password) return next(badRequest("Password is required"));
 
-    //   const { User } = DB_PRIMARY;
+      const { User } = DB_PRIMARY;
 
-    //   // Cari user berdasarkan NIP
-    //   const user = await User.findOne({
-    //     where: { nip },
-    //     include: [User.associations.role],
-    //   });
+      // Cari user berdasarkan NIP
+      const user = await User.findOne({
+        where: { nip },
+        include: [User.associations.role],
+      });
 
-    //   if (!user) return next(notFound("User not found"));
+      res.status(200).json({
+        message: "Login successful",
+        user
+      });
 
-    //   // Validasi password
-    //   const encryptedPassword = sha1(password);
-    //   if (user.password !== encryptedPassword) {
-    //     return next(badRequest("Invalid password"));
-    //   }
+      // if (!user) return next(notFound("User not found"));
 
-    //   // Generate token
-    //   const accessToken = jwt.sign(
-    //     {
-    //       id: user.id,
-    //       fullName: user.fullName,
-    //       photo: user?.photo,
-    //       phoneNumber: user?.phoneNumber,
-    //       nip: user.nip,
-    //       roleId: user.roleId,
-    //       role: user.role,
-    //     },
-    //     ACCESS_KEY,
-    //     { expiresIn: ACCESS_EXP }
-    //   );
+      // // Validasi password
+      // const encryptedPassword = sha1(password);
+      // if (user.password !== encryptedPassword) {
+      //   return next(badRequest("Invalid password"));
+      // }
 
-    //   const duration = ACCESS_EXP;
-    //   const { iat, exp }: any = jwt.verify(accessToken, ACCESS_KEY);
+      // // Generate token
+      // const accessToken = jwt.sign(
+      //   {
+      //     id: user.id,
+      //     fullName: user.fullName,
+      //     photo: user?.photo,
+      //     phoneNumber: user?.phoneNumber,
+      //     nip: user.nip,
+      //     roleId: user.roleId,
+      //     role: user.role,
+      //   },
+      //   ACCESS_KEY,
+      //   { expiresIn: ACCESS_EXP }
+      // );
 
-    //   // Kirim respons
-    //   res.cookie("accessToken", accessToken);
-    //   res.status(200).json({
-    //     message: "Login successful",
-    //     accessToken,
-    //     duration,
-    //     iat,
-    //     exp,
-    //   });
-    //   // const { nip, password } = req.body;
+      // const duration = ACCESS_EXP;
+      // const { iat, exp }: any = jwt.verify(accessToken, ACCESS_KEY);
 
-    //   // if (!nip) throw badRequest("nip required");
-    //   // if (!password) throw badRequest("Password required");
+      // // Kirim respons
+      // res.cookie("accessToken", accessToken);
+      // res.status(200).json({
+      //   message: "Login successful",
+      //   accessToken,
+      //   duration,
+      //   iat,
+      //   exp,
+      // });
+      // const { nip, password } = req.body;
 
-    //   // const { User } = DB_PRIMARY;
+      // if (!nip) throw badRequest("nip required");
+      // if (!password) throw badRequest("Password required");
 
-    //   // const user = await User.findOne({
-    //   //   where: {
-    //   //     [Op.or]: [{ nip }, { nip: nip }],
-    //   //   },
-    //   //   include: [User.associations.role],
-    //   // });
+      // const { User } = DB_PRIMARY;
 
-    //   // if (!user) throw notFound("User not found");
+      // const user = await User.findOne({
+      //   where: {
+      //     [Op.or]: [{ nip }, { nip: nip }],
+      //   },
+      //   include: [User.associations.role],
+      // });
 
-    //   // const encryptedPassword = sha1(password);
-    //   // if (user.password !== encryptedPassword) {
-    //   //   throw badRequest("Invalid password");
-    //   // }
+      // if (!user) throw notFound("User not found");
 
-    //   // const accessToken = jwt.sign(
-    //   //   {
-    //   //     id: user.id,
-    //   //     fullName: user.fullName,
-    //   //     photo: user?.photo,
-    //   //     phoneNumber: user?.phoneNumber,
-    //   //     nip: user.nip,
-    //   //     roleId: user.roleId,
-    //   //     role: user.role,
-    //   //   },
-    //   //   ACCESS_KEY,
-    //   //   { expiresIn: ACCESS_EXP }
-    //   // );
+      // const encryptedPassword = sha1(password);
+      // if (user.password !== encryptedPassword) {
+      //   throw badRequest("Invalid password");
+      // }
 
-    //   // const duration = ACCESS_EXP;
-    //   // const { iat, exp }: any = jwt.verify(accessToken, ACCESS_KEY);
+      // const accessToken = jwt.sign(
+      //   {
+      //     id: user.id,
+      //     fullName: user.fullName,
+      //     photo: user?.photo,
+      //     phoneNumber: user?.phoneNumber,
+      //     nip: user.nip,
+      //     roleId: user.roleId,
+      //     role: user.role,
+      //   },
+      //   ACCESS_KEY,
+      //   { expiresIn: ACCESS_EXP }
+      // );
 
-    //   // res.cookie("accessToken", accessToken);
-    //   // res.json({
-    //   //   message: "Login success",
-    //   //   accessToken,
-    //   //   duration,
-    //   //   iat,
-    //   //   exp,
-    //   // });
-    // } catch (error) {
-    //   if (error instanceof Error) {
-    //     console.error("Login error:", error.message);
-    //     next(error);
-    //   } else {
-    //     console.error("Unknown error:", error);
-    //     next(new Error("Internal server error"));
-    //   }
-    // }
+      // const duration = ACCESS_EXP;
+      // const { iat, exp }: any = jwt.verify(accessToken, ACCESS_KEY);
+
+      // res.cookie("accessToken", accessToken);
+      // res.json({
+      //   message: "Login success",
+      //   accessToken,
+      //   duration,
+      //   iat,
+      //   exp,
+      // });
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Login error:", error.message);
+        next(error);
+      } else {
+        console.error("Unknown error:", error);
+        next(new Error("Internal server error"));
+      }
+    }
   }
 
   async handleLogout(req: Request, res: Response) {
