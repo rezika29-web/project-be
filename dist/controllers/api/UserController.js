@@ -17,6 +17,10 @@ const sha1_1 = __importDefault(require("sha1"));
 const sequelize_1 = require("sequelize");
 const ApiController_1 = __importDefault(require("../../core/ApiController"));
 const ErrorHelper_1 = require("../../helpers/ErrorHelper");
+const isValidNip = (nip) => {
+    const nipRegex = /^[0-9]{18}$/; // NIP biasanya 18 digit angka
+    return nipRegex.test(nip);
+};
 class UserController extends ApiController_1.default {
     buildCriteria({ fullName, nip, roleId, keyword, }) {
         let criteria = {};
@@ -150,7 +154,7 @@ class UserController extends ApiController_1.default {
             });
         });
     }
-    handleCreate(req, res) {
+    handleCreate(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             /*
             #swagger.tags = ['User']
@@ -186,61 +190,114 @@ class UserController extends ApiController_1.default {
               },
             }
             */
-            const { fullName, nip, phoneNumber, password, retypePassword, roleId, } = req.body;
-            const { User, Role } = DB_PRIMARY;
-            // Validate
-            if (!fullName)
-                throw (0, ErrorHelper_1.badRequest)("Full Name required");
-            if (!nip)
-                throw (0, ErrorHelper_1.badRequest)("Nip required");
-            if (!nip.isValidNip()) {
-                throw (0, ErrorHelper_1.badRequest)("Invalid Nip format");
-            }
-            const userBy = yield User.findOne({
-                where: {
+            try {
+                const { fullName, nip, phoneNumber, password, retypePassword, roleId } = req.body;
+                const { User, Role } = DB_PRIMARY;
+                if (!fullName)
+                    throw (0, ErrorHelper_1.badRequest)("Full Name required");
+                if (!nip)
+                    throw (0, ErrorHelper_1.badRequest)("NIP required");
+                if (!isValidNip(nip)) {
+                    throw (0, ErrorHelper_1.badRequest)("Invalid NIP format");
+                }
+                const userByNip = yield User.findOne({ where: { nip } });
+                if (userByNip) {
+                    throw (0, ErrorHelper_1.badRequest)("A User with the same NIP already exists");
+                }
+                if (!phoneNumber)
+                    throw (0, ErrorHelper_1.badRequest)("Phone Number required");
+                if (!password)
+                    throw (0, ErrorHelper_1.badRequest)("Password required");
+                if (!retypePassword)
+                    throw (0, ErrorHelper_1.badRequest)("Retype Password required");
+                if (password !== retypePassword) {
+                    throw (0, ErrorHelper_1.badRequest)("Retype the password with the same password");
+                }
+                if (!roleId)
+                    throw (0, ErrorHelper_1.badRequest)("Role ID required");
+                const role = yield Role.findByPk(roleId);
+                if (!role) {
+                    throw (0, ErrorHelper_1.notFound)("Role not found");
+                }
+                const id = (0, uuid_1.v4)();
+                const hashedPassword = (0, sha1_1.default)(password);
+                const newUser = yield User.create({
+                    id,
+                    fullName,
                     nip,
-                },
-            });
-            if (userBy) {
-                throw (0, ErrorHelper_1.badRequest)("A NIP with the same  already exists");
+                    phoneNumber,
+                    password: hashedPassword,
+                    roleId,
+                });
+                res.status(201).json({
+                    message: "Create new data success",
+                    data: {
+                        id: newUser.id,
+                        fullName: newUser.fullName,
+                        nip: newUser.nip,
+                        phoneNumber: newUser.phoneNumber,
+                        roleId: newUser.roleId,
+                    },
+                });
             }
-            if (!phoneNumber)
-                throw (0, ErrorHelper_1.badRequest)("Phone Number required");
-            const userByNip = yield User.findOne({
-                where: {
-                    nip,
-                },
-            });
-            if (userByNip) {
-                throw (0, ErrorHelper_1.badRequest)("A User with the same NIP already exists");
+            catch (error) {
+                next(error); // Forward error to the next middleware
             }
-            if (!password)
-                throw (0, ErrorHelper_1.badRequest)("Password required");
-            if (!retypePassword)
-                throw (0, ErrorHelper_1.badRequest)("Retype Password required");
-            if (password !== retypePassword) {
-                throw (0, ErrorHelper_1.badRequest)("Retype the password with the same password");
-            }
-            if (!roleId)
-                throw (0, ErrorHelper_1.badRequest)("Role ID required");
-            const role = yield Role.findByPk(roleId);
-            if (!role)
-                throw (0, ErrorHelper_1.notFound)("Role not found");
-            const id = (0, uuid_1.v4)();
-            const salt = (0, sha1_1.default)((0, uuid_1.v4)());
-            const newPassword = (0, sha1_1.default)(password);
-            yield User.create({
-                id,
-                fullName,
-                nip,
-                phoneNumber,
-                password: newPassword,
-                roleId,
-            });
-            res.status(201).json({
-                message: "Create new data success",
-                id,
-            });
+            // const {
+            //   fullName,
+            //   nip,
+            //   phoneNumber,
+            //   password,
+            //   retypePassword,
+            //   roleId,
+            // } = req.body;
+            // const { User, Role } = DB_PRIMARY;
+            // // Validate
+            // if (!fullName) throw badRequest("Full Name required");
+            // if (!nip) throw badRequest("Nip required");
+            // if (!nip.isValidNip()) {
+            //   throw badRequest("Invalid Nip format");
+            // }
+            // const userBy = await User.findOne({
+            //   where: {
+            //     nip,
+            //   },
+            // });
+            // if (userBy) {
+            //   throw badRequest("A NIP with the same  already exists");
+            // }
+            // if (!phoneNumber) throw badRequest("Phone Number required");
+            // const userByNip = await User.findOne({
+            //   where: {
+            //     nip,
+            //   },
+            // });
+            // if (userByNip) {
+            //   throw badRequest("A User with the same NIP already exists");
+            // }
+            // if (!password) throw badRequest("Password required");
+            // if (!retypePassword) throw badRequest("Retype Password required");
+            // if (password !== retypePassword) {
+            //   throw badRequest("Retype the password with the same password");
+            // }
+            // if (!roleId) throw badRequest("Role ID required");
+            // const role = await Role.findByPk(roleId);
+            // if (!role) throw notFound("Role not found");
+            // const id = uuidv4();
+            // const salt = sha1(uuidv4());
+            // const newPassword = sha1(password);
+            // await User.create({
+            //   id,
+            //   fullName,
+            //   nip,
+            //   phoneNumber,
+            //   password: newPassword,
+            //   roleId,
+            // });
+            // res.status(201).json({
+            //   message: "Create new data success",
+            //   id,
+            // });
         });
     }
     handleUpdate(req, res) {

@@ -1,10 +1,16 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import sha1 from "sha1";
 import { Op, Sequelize } from "sequelize";
 import ApiController from "../../core/ApiController";
 import { badRequest, notFound } from "../../helpers/ErrorHelper";
 import { UserModel } from "../../models/UserModel";
+
+
+const isValidNip = (nip: string): boolean => {
+  const nipRegex = /^[0-9]{18}$/; // NIP biasanya 18 digit angka
+  return nipRegex.test(nip);
+};
 
 export default class UserController extends ApiController {
   buildCriteria({
@@ -175,7 +181,7 @@ export default class UserController extends ApiController {
     });
   }
 
-  async handleCreate(req: Request, res: Response) {
+  async handleCreate(req: Request, res: Response, next: NextFunction): Promise<void> {
     /* 
     #swagger.tags = ['User']
     #swagger.requestBody = {
@@ -211,80 +217,137 @@ export default class UserController extends ApiController {
     }
     */
 
-    const {
-      fullName,
-      nip,
-      phoneNumber,
-      password,
-      retypePassword,
-      roleId,
-    } = req.body;
-
-    const { User, Role } = DB_PRIMARY;
-
-    // Validate
-
-    if (!fullName) throw badRequest("Full Name required");
-
-    if (!nip) throw badRequest("Nip required");
-    if (!nip.isValidNip()) {
-      throw badRequest("Invalid Nip format");
-    }
-
-    const userBy = await User.findOne({
-      where: {
+    try {
+      const { fullName, nip, phoneNumber, password, retypePassword, roleId } = req.body;
+      const { User, Role } = DB_PRIMARY;
+  
+      if (!fullName) throw badRequest("Full Name required");
+      if (!nip) throw badRequest("NIP required");
+  
+      if (!isValidNip(nip)) {
+        throw badRequest("Invalid NIP format");
+      }
+  
+      const userByNip = await User.findOne({ where: { nip } });
+      if (userByNip) {
+        throw badRequest("A User with the same NIP already exists");
+      }
+  
+      if (!phoneNumber) throw badRequest("Phone Number required");
+      if (!password) throw badRequest("Password required");
+      if (!retypePassword) throw badRequest("Retype Password required");
+  
+      if (password !== retypePassword) {
+        throw badRequest("Retype the password with the same password");
+      }
+  
+      if (!roleId) throw badRequest("Role ID required");
+  
+      const role = await Role.findByPk(roleId);
+      if (!role) {
+        throw notFound("Role not found");
+      }
+  
+      const id = uuidv4();
+      const hashedPassword = sha1(password);
+  
+      const newUser = await User.create({
+        id,
+        fullName,
         nip,
-      },
-    });
-
-    if (userBy) {
-      throw badRequest("A NIP with the same  already exists");
+        phoneNumber,
+        password: hashedPassword,
+        roleId,
+      });
+  
+      res.status(201).json({
+        message: "Create new data success",
+        data: {
+          id: newUser.id,
+          fullName: newUser.fullName,
+          nip: newUser.nip,
+          phoneNumber: newUser.phoneNumber,
+          roleId: newUser.roleId,
+        },
+      });
+    } catch (error) {
+      next(error); // Forward error to the next middleware
     }
 
-    if (!phoneNumber) throw badRequest("Phone Number required");
+    // const {
+    //   fullName,
+    //   nip,
+    //   phoneNumber,
+    //   password,
+    //   retypePassword,
+    //   roleId,
+    // } = req.body;
+
+    // const { User, Role } = DB_PRIMARY;
+
+    // // Validate
+
+    // if (!fullName) throw badRequest("Full Name required");
+
+    // if (!nip) throw badRequest("Nip required");
+    // if (!nip.isValidNip()) {
+    //   throw badRequest("Invalid Nip format");
+    // }
+
+    // const userBy = await User.findOne({
+    //   where: {
+    //     nip,
+    //   },
+    // });
+
+    // if (userBy) {
+    //   throw badRequest("A NIP with the same  already exists");
+    // }
+
+    // if (!phoneNumber) throw badRequest("Phone Number required");
 
 
 
-    const userByNip = await User.findOne({
-      where: {
-        nip,
-      },
-    });
+    // const userByNip = await User.findOne({
+    //   where: {
+    //     nip,
+    //   },
+    // });
 
-    if (userByNip) {
-      throw badRequest("A User with the same NIP already exists");
-    }
+    // if (userByNip) {
+    //   throw badRequest("A User with the same NIP already exists");
+    // }
 
-    if (!password) throw badRequest("Password required");
-    if (!retypePassword) throw badRequest("Retype Password required");
+    // if (!password) throw badRequest("Password required");
+    // if (!retypePassword) throw badRequest("Retype Password required");
 
-    if (password !== retypePassword) {
-      throw badRequest("Retype the password with the same password");
-    }
+    // if (password !== retypePassword) {
+    //   throw badRequest("Retype the password with the same password");
+    // }
 
-    if (!roleId) throw badRequest("Role ID required");
+    // if (!roleId) throw badRequest("Role ID required");
 
-    const role = await Role.findByPk(roleId);
-    if (!role) throw notFound("Role not found");
+    // const role = await Role.findByPk(roleId);
+    // if (!role) throw notFound("Role not found");
 
-    const id = uuidv4();
+    // const id = uuidv4();
 
-    const salt = sha1(uuidv4());
-    const newPassword = sha1(password);
+    // const salt = sha1(uuidv4());
+    // const newPassword = sha1(password);
 
-    await User.create({
-      id,
-      fullName,
-      nip,
-      phoneNumber,
-      password: newPassword,
-      roleId,
-    });
+    // await User.create({
+    //   id,
+    //   fullName,
+    //   nip,
+    //   phoneNumber,
+    //   password: newPassword,
+    //   roleId,
+    // });
 
-    res.status(201).json({
-      message: "Create new data success",
-      id,
-    });
+    // res.status(201).json({
+    //   message: "Create new data success",
+    //   id,
+    // });
   }
 
   async handleUpdate(req: Request, res: Response) {
@@ -344,10 +407,10 @@ export default class UserController extends ApiController {
         res.json({ message: "Update data success" });
       } catch (error) {
         if (error instanceof Error) {
-          res.status(500).json({ message: error.message });
-        } else {
-          res.status(500).json({ message: 'An unknown error occurred' });
-        }
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'An unknown error occurred' });
+    }
       }
     
     // const { id } = req.params;
