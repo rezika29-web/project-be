@@ -37,25 +37,27 @@ export default class AuthController extends ApiController {
     try {
       const { nip, password } = req.body;
 
-      if (!nip) throw badRequest("nip required");
-      if (!password) throw badRequest("Password required");
+      // Validasi input
+      if (!nip) return next(badRequest("NIP is required"));
+      if (!password) return next(badRequest("Password is required"));
 
       const { User } = DB_PRIMARY;
 
+      // Cari user berdasarkan NIP
       const user = await User.findOne({
-        where: {
-          [Op.or]: [{ nip }, { nip: nip }],
-        },
+        where: { nip },
         include: [User.associations.role],
       });
 
-      if (!user) throw notFound("User not found");
+      if (!user) return next(notFound("User not found"));
 
+      // Validasi password
       const encryptedPassword = sha1(password);
       if (user.password !== encryptedPassword) {
-        throw badRequest("Invalid password");
+        return next(badRequest("Invalid password"));
       }
 
+      // Generate token
       const accessToken = jwt.sign(
         {
           id: user.id,
@@ -73,14 +75,61 @@ export default class AuthController extends ApiController {
       const duration = ACCESS_EXP;
       const { iat, exp }: any = jwt.verify(accessToken, ACCESS_KEY);
 
+      // Kirim respons
       res.cookie("accessToken", accessToken);
-      res.json({
-        message: "Login success",
+      res.status(200).json({
+        message: "Login successful",
         accessToken,
         duration,
         iat,
         exp,
       });
+      // const { nip, password } = req.body;
+
+      // if (!nip) throw badRequest("nip required");
+      // if (!password) throw badRequest("Password required");
+
+      // const { User } = DB_PRIMARY;
+
+      // const user = await User.findOne({
+      //   where: {
+      //     [Op.or]: [{ nip }, { nip: nip }],
+      //   },
+      //   include: [User.associations.role],
+      // });
+
+      // if (!user) throw notFound("User not found");
+
+      // const encryptedPassword = sha1(password);
+      // if (user.password !== encryptedPassword) {
+      //   throw badRequest("Invalid password");
+      // }
+
+      // const accessToken = jwt.sign(
+      //   {
+      //     id: user.id,
+      //     fullName: user.fullName,
+      //     photo: user?.photo,
+      //     phoneNumber: user?.phoneNumber,
+      //     nip: user.nip,
+      //     roleId: user.roleId,
+      //     role: user.role,
+      //   },
+      //   ACCESS_KEY,
+      //   { expiresIn: ACCESS_EXP }
+      // );
+
+      // const duration = ACCESS_EXP;
+      // const { iat, exp }: any = jwt.verify(accessToken, ACCESS_KEY);
+
+      // res.cookie("accessToken", accessToken);
+      // res.json({
+      //   message: "Login success",
+      //   accessToken,
+      //   duration,
+      //   iat,
+      //   exp,
+      // });
     } catch (error) {
       if (error instanceof Error) {
         console.error("Login error:", error.message);
