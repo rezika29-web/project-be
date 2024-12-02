@@ -8,7 +8,9 @@ import ApiController from "../../core/ApiController";
 import { badRequest, notFound } from "../../helpers/ErrorHelper";
 import UserController from "./UserController";
 
+
 const { ACCESS_KEY, ACCESS_EXP } = config.envy;
+const akses = config
 
 export default class AuthController extends ApiController {
   async handleLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -46,7 +48,7 @@ export default class AuthController extends ApiController {
       const { User } = DB_PRIMARY;
       res.status(200).json({
         message: "Login successful",
-        User
+        akses
       });
 
 

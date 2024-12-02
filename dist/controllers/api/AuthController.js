@@ -18,6 +18,7 @@ const AllConfig_1 = __importDefault(require("../../config/AllConfig"));
 const ApiController_1 = __importDefault(require("../../core/ApiController"));
 const ErrorHelper_1 = require("../../helpers/ErrorHelper");
 const { ACCESS_KEY, ACCESS_EXP } = AllConfig_1.default.envy;
+const akses = AllConfig_1.default;
 class AuthController extends ApiController_1.default {
     handleLogin(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -53,7 +54,7 @@ class AuthController extends ApiController_1.default {
                 const { User } = DB_PRIMARY;
                 res.status(200).json({
                     message: "Login successful",
-                    User
+                    akses
                 });
                 // Cari user berdasarkan NIP
                 const user = yield User.findOne({
