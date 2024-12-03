@@ -46,60 +46,60 @@ export default class AuthController extends ApiController {
       if (!password) return next(badRequest("Password is required"));
 
       const { User } = DB_PRIMARY;
-      res.status(200).json({
-        message: "Login successful",
-        akses
-      });
+      // res.status(200).json({
+      //   message: "Login successful",
+      //   akses
+      // });
 
 
       // Cari user berdasarkan NIP
-      const user = await User.findOne({
-        where: { nip },
-        // include: [User.associations.role],
-      });
       // const user = await User.findOne({
-      //   where: {
-      //     [Op.or]: [{ nip }, { nip: nip }],
-      //   },
-      //   include: [User.associations.role],
+      //   where: { nip },
+      //   // include: [User.associations.role],
       // });
+      const user = await User.findOne({
+        where: {
+          [Op.or]: [{ nip }, { nip: nip }],
+        },
+        include: [User.associations.role],
+      });
 
       
-      // if (!user) return next(notFound("User not found"));
+      if (!user) return next(notFound("User not found"));
 
-      // // Validasi password
-      // const encryptedPassword = sha1(password);
-      // if (user.password !== encryptedPassword) {
-      //   return next(badRequest("Invalid password"));
-      // }
+      // Validasi password
+      const encryptedPassword = sha1(password);
+      if (user.password !== encryptedPassword) {
+        return next(badRequest("Invalid password"));
+      }
 
-      // // Generate token
-      // const accessToken = jwt.sign(
-      //   {
-      //     id: user.id,
-      //     fullName: user.fullName,
-      //     photo: user?.photo,
-      //     phoneNumber: user?.phoneNumber,
-      //     nip: user.nip,
-      //     roleId: user.roleId,
-      //     role: user.role,
-      //   },
-      //   ACCESS_KEY,
-      //   { expiresIn: ACCESS_EXP }
-      // );
+      // Generate token
+      const accessToken = jwt.sign(
+        {
+          id: user.id,
+          fullName: user.fullName,
+          photo: user?.photo,
+          phoneNumber: user?.phoneNumber,
+          nip: user.nip,
+          roleId: user.roleId,
+          role: user.role,
+        },
+        ACCESS_KEY,
+        { expiresIn: ACCESS_EXP }
+      );
 
-      // const duration = ACCESS_EXP;
-      // const { iat, exp }: any = jwt.verify(accessToken, ACCESS_KEY);
+      const duration = ACCESS_EXP;
+      const { iat, exp }: any = jwt.verify(accessToken, ACCESS_KEY);
 
-      // // Kirim respons
-      // res.cookie("accessToken", accessToken);
-      // res.status(200).json({
-      //   message: "Login successful",
-      //   accessToken,
-      //   duration,
-      //   iat,
-      //   exp,
-      // });
+      // Kirim respons
+      res.cookie("accessToken", accessToken);
+      res.status(200).json({
+        message: "Login successful",
+        accessToken,
+        duration,
+        iat,
+        exp,
+      });
       // const { nip, password } = req.body;
 
       // if (!nip) throw badRequest("nip required");
@@ -146,6 +146,7 @@ export default class AuthController extends ApiController {
       //   iat,
       //   exp,
       // });
+    
     } catch (error) {
       if (error instanceof Error) {
         console.error("Login error:", error.message);
