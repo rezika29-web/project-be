@@ -27,9 +27,12 @@ const { APP_NAME, APP_VERSION, HOST_PORT } = AllConfig_1.default.envy;
 const app = (0, express_1.default)();
 const allowedOrigins = [
     "https://project-be-production-81c4.up.railway.app",
-    "biroumumsumbar.com",
+    "https://www.biroumumsumbar.com",
     "https://project-fe-production.up.railway.app",
     "http://localhost:4000",
+    "https://project-fe-blond.vercel.app",
+    "https://project-fe-biroumums-projects-b219724b.vercel.app",
+    "https://project-fe-git-main-biroumums-projects-b219724b.vercel.app"
 ];
 app.use((0, cors_1.default)({
     origin: (origin, callback) => {
